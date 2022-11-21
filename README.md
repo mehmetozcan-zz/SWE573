@@ -8,10 +8,10 @@ Dependencies:
 
 From the terminal, run below command in the project main directory to start the server.
 
-> python manage.py runserver 
+> python manage.py runserver
 
 Open below url from the browser.
 
-http://127.0.0.1:8000/accounts/login
+http://127.0.0.1:8000/
 
-Current user that is able to login is "mehmetaliozcan", and the password is "1234qwer"
+Click Sign Up for registration, click login if you are already a user.
