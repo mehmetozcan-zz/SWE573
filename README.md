@@ -14,4 +14,4 @@ Open below url from the browser.
 
 http://127.0.0.1:8000/
 
-Click Sign Up for registration, click login if you are already a user.
+Click "Sign Up" for registration, click "Log In" if you are already a user.
