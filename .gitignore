@@ -1,3 +1,4 @@
 sent_emails/*
 django_project/__pycache__*
 accounts/__pycache__*
+data/*
