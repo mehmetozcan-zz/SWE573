@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'blog.apps.BlogConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -79,7 +80,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'swe573-mysql',
         'USER': 'root',
-        'PASSWORD': '********',
+        'PASSWORD': '1234qwer',
         'HOST': 'db',
         'PORT': '3306',
     }
