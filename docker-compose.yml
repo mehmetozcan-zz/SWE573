@@ -4,7 +4,7 @@ version: '3'
 services:
   web:
     build: .
-    command: bash -c "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    command: bash -c "pip install -r requirements.txt && python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     container_name: SWE573_Project
     volumes:
       - .:/SWE573_Project
@@ -14,7 +14,7 @@ services:
       db:
         condition: service_healthy
   db:
-    image: mysql
+    image: mysql:8.0
     expose:
       - 3306
     ports:
