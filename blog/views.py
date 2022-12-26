@@ -1,9 +1,11 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
+from users.models import Profile
 import requests
 from bs4 import BeautifulSoup
 from django.http import JsonResponse
+from itertools import chain
 from django.views.generic import (
     ListView,
     DetailView,
@@ -136,3 +138,18 @@ def generate_preview(request):
     print(meta_data)
 
     return JsonResponse(meta_data)
+
+def posts_of_following_profiles(request):
+    profile = Profile.objects.get(user=request.user)
+    users = [user for user in profile.following.all()]
+    posts = []
+    paginate_by = 5
+    qs = None
+    for u in users:
+        p = Post.objects.filter(author=u)
+        posts.append(p)
+    my_posts = Post.objects.filter(author=request.user)
+    posts.append(my_posts)
+    if len(posts) > 0:
+        qs = sorted(chain(*posts), reverse=True, key=lambda obj: obj.date_posted)
+    return render(request, 'blog/myspace.html', {'posts':qs})
