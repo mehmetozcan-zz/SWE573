@@ -20,6 +20,7 @@ urlpatterns = [
     path('post/<int:pk>', FavouritesView, name='post-favourites'),
     path('favouriteposts', views.favourite_posts, name='favourite-posts'),
     path('filtertags/<int:pk>', views.filter_tags, name='filter-tags'),
+    path('searchkeyword/', views.search_keyword, name='search-keyword'),
     path('post/new/', PostCreateView.as_view(), name='post-create'),
     path('post/<int:pk>/update', PostUpdateView.as_view(), name='post-update'),
     path('post/<int:pk>/delete', PostDeleteView.as_view(), name='post-delete'),

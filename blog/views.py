@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 from django.http import JsonResponse, HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from itertools import chain
+from django.db.models import Q
 from django.views.generic import (
     ListView,
     DetailView,
@@ -185,3 +186,15 @@ def filter_tags(request,pk):
         'taggedposts': Post.objects.filter(tags=pk)
        }
     return render(request, 'blog/filtertags.html', context)
+
+def search_keyword(request):
+    if request.method == "POST":
+        keyword = request.POST['keyword']
+        posts = Post.objects.filter(Q(title__icontains=keyword) | Q(content__icontains=keyword))
+        count = posts.count()
+        if count > 0:
+            return render(request, 'blog/post_search.html',
+                      {'keyword':keyword, 'posts':posts, 'count':count})
+        else:
+            return render(request, 'blog/post_search.html',
+                          {'keyword': keyword, 'count':count})
