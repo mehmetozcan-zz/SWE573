@@ -1,10 +1,11 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from users.models import Profile
 import requests
 from bs4 import BeautifulSoup
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
+from django.urls import reverse, reverse_lazy
 from itertools import chain
 from django.views.generic import (
     ListView,
@@ -39,12 +40,21 @@ class UserPostListView(ListView):
         user = get_object_or_404(User, username=self.kwargs.get('username'))
         return Post.objects.filter(author=user).order_by('-date_posted')
 
-class PostDetailView(DetailView):
+class PostDetailView(LoginRequiredMixin, DetailView):
     model = Post
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(**kwargs)
+        viewed_post = get_object_or_404(Post, id=self.kwargs['pk'])
+        if viewed_post.favourites.filter(id=self.request.user.id).exists():
+            save = True
+        else:
+            save = False
+        context["save"] = save
+        return context
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
-    fields = ['title', 'content', 'link']
+    fields = ['title', 'content', 'link', 'tags']
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -52,7 +62,7 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
-    fields = ['title', 'content', 'link']
+    fields = ['title', 'content', 'link', 'tags']
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -153,3 +163,25 @@ def posts_of_following_profiles(request):
     if len(posts) > 0:
         qs = sorted(chain(*posts), reverse=True, key=lambda obj: obj.date_posted)
     return render(request, 'blog/myspace.html', {'posts':qs})
+
+def FavouritesView(request, pk):
+    if request.method == 'POST':
+        post = get_object_or_404(Post, id=request.POST.get('post_id'))
+        if post.favourites.filter(id=request.user.id).exists():
+            post.favourites.remove(request.user.id)
+        else:
+            post.favourites.add(request.user.id)
+    return HttpResponseRedirect(reverse('post-detail', args=[str(pk)]))
+
+def favourite_posts(request):
+    context =  {
+        'favourites': Post.objects.filter(favourites=request.user)
+       }
+    print(context)
+    return render(request, 'blog/favourites.html', context)
+
+def filter_tags(request,pk):
+    context =  {
+        'taggedposts': Post.objects.filter(tags=pk)
+       }
+    return render(request, 'blog/filtertags.html', context)
